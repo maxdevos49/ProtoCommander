@@ -1,0 +1,23 @@
+{
+  "name": "protocommand",
+  "version": "1.0.0",
+  "description": "Frontend service framework with CLUI command functionality",
+  "main": "index.js",
+  "devDependencies": {
+    "@types/chai": "^4.2.12",
+    "@types/mocha": "^8.0.2",
+    "@types/node": "^14.0.27",
+    "typescript": "^3.9.7"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./test/run.js"
+  },
+  "type": "module",
+  "keywords": [
+    "services",
+    "di"
+  ],
+  "author": "Maxwell DeVos",
+  "license": "MIT"
+}
