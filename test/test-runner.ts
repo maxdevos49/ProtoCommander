@@ -5,13 +5,11 @@ import path from "path";
 function template(files: string[]): string {
     return /*html*/`
 <html>
-
     <head>
         <meta charset="utf-8">
-        <title>Mocha Tests</title>
+        <title>ProtoCommander Test</title>
         <link href="https://unpkg.com/mocha/mocha.css" rel="stylesheet" />
     </head>
-    
     <body>
         <div id="mocha"></div>
     
@@ -27,7 +25,6 @@ function template(files: string[]): string {
             mocha.run();
         </script>
     </body>
-    
 </html>`;
 };
 
@@ -124,4 +121,6 @@ const server = http.createServer((req, res) => {
     }
 });
 
-server.listen(process.env.PORT || 8080);
+server.listen(process.env.PORT || 8080, () => {
+    console.log(`Test server now running at: http://localhost:${process.env.PORT || 8080}`);
+});

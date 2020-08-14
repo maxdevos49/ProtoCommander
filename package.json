@@ -11,13 +11,10 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "node ./test/run.js"
+    "test": "tsc && node ./test/test-runner.js"
   },
   "type": "module",
-  "keywords": [
-    "services",
-    "di"
-  ],
+  "keywords": [],
   "author": "Maxwell DeVos",
   "license": "MIT"
 }
