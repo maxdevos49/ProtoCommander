@@ -11,6 +11,9 @@ export class Injector {
      */
     public static resolve<T>(constructor: new (...args: any) => T): T {
 
+        if (constructor === null || constructor === undefined || typeof constructor !== "function")
+            throw new TypeError("The constructor supplied is not constructable");
+
         try {
 
             if (this.serviceCollection.hasInstance(constructor))
@@ -25,8 +28,14 @@ export class Injector {
                 return Injector.resolve<any>(token);
             });
 
-            return new constructor(...injections);
+            let instance: T = new constructor(...injections);
+
+            if (this.serviceCollection.hasConfiguration(constructor))
+                this.serviceCollection.getConfiguration(constructor)(instance);
+
+            return instance;
         } catch (err) {
+            console.log(err);
             if (err.message.indexOf('is not a constructor') >= 0) {
                 throw new TypeError("The constructor supplied is not constructable");
             } else {

@@ -35,9 +35,6 @@ export class ServiceCollection implements IServiceCollection {
         if (this._services.has(service))
             throw new Error(`Service: ${service.name} is already registered.`);
 
-        //Create singleton before registering as singleton so we don't get a recursive loop
-        // this._singletonInstances.set(service, Injector.resolve(service));
-
         this._services.set(service, {
             serviceType: ServiceType.Singleton
         });
@@ -113,5 +110,24 @@ export class ServiceCollection implements IServiceCollection {
     public hasInstance<T>(service: new (...args: any[]) => T): boolean {
         return this._singletonInstances.has(service);
     }
+
+    public hasConfiguration<T>(service: new (...args: any[]) => T): boolean {
+        if (!this._services.has(service))
+            return false;
+
+        return this._services.get(service).serviceConfiguration !== undefined;
+    }
+
+    public getConfiguration<T>(service: new (...args: any[]) => T): (service: T) => void {
+
+        if (!this._services.has(service))
+            throw new TypeError("Service must be a valid constructor and be registered as a service.");
+
+        if (!this._services.get(service).serviceConfiguration)
+            throw new Error("Service does not have a registered configuration.");
+
+        return this._services.get(service).serviceConfiguration;
+    }
+
 
 }

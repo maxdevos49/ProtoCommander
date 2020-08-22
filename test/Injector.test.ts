@@ -42,8 +42,8 @@ describe("Injector.serviceCollection", () => {
 describe("Injector.resolve", () => {
 
     it("Should throw an exception if the function is not constructable", () => {
-        expect(() => Injector.resolve(null)).to.throw(new TypeError("The constructor supplied is not constructable"));
-        expect(() => Injector.resolve(undefined)).to.throw(new TypeError("The constructor supplied is not constructable"));
+        expect(() => Injector.resolve(null)).to.throw("The constructor supplied is not constructable");
+        expect(() => Injector.resolve(undefined)).to.throw("The constructor supplied is not constructable");
     });
 
     it("Should return a proper instance of the given object without arguments", () => {
@@ -52,6 +52,19 @@ describe("Injector.resolve", () => {
 
     it("Should return a proper instance of the given object with arguments", () => {
         expect(Injector.resolve(TestWithArguments)).to.be.instanceOf(TestWithArguments);
+    });
+
+    it("Should properly configure the service", () => {
+        Injector.serviceCollection.addTransient(TestWithArguments);
+
+        expect(Injector.resolve(TestWithArguments).test2).to.equal(true);
+
+        Injector.serviceCollection.configure(TestWithArguments, (twa) => {
+            twa.test2 = false;
+        });
+
+        expect(Injector.resolve(TestWithArguments).test2).to.equal(false);
+
     });
 
 });

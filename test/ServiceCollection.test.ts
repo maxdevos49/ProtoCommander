@@ -7,7 +7,7 @@ const expect = chai.expect;
 
 @service()
 class Test {
-    public hey: string = "heeeeeyyyy";
+    public hey: string = "hey";
     constructor() {
 
     }
@@ -16,7 +16,7 @@ class Test {
 @service()
 class Test2 {
 
-    public bye: string = "byyeeeeeeee";
+    public bye: string = "bye";
 
     constructor(test: Test, test2: Test) {
 
@@ -143,7 +143,7 @@ describe("ServiceCollection.isSingleton", () => {
     });
 });
 
-describe("ServiceCollection,hasInstance", () => {
+describe("ServiceCollection.hasInstance", () => {
     let serviceCollection = Injector.serviceCollection;
 
     it("Should return false if the service is not registered, invalid, or does not have a instance", () => {
@@ -154,5 +154,38 @@ describe("ServiceCollection,hasInstance", () => {
 
     it("Should return true if the service is registered and already has a instance", () => {
         expect(serviceCollection.hasInstance(Test)).to.equal(true);
+    });
+});
+
+describe("ServiceCollection.hasConfiguration", () => {
+    let serviceCollection = Injector.serviceCollection;
+
+    it("Should return false if the service is invalid or is not registered", () => {
+        expect(serviceCollection.hasConfiguration(null)).to.equal(false);
+        expect(serviceCollection.hasConfiguration(undefined)).to.equal(false);
+        expect(serviceCollection.hasConfiguration(Boolean)).to.equal(false);
+        expect(serviceCollection.hasConfiguration(Test2)).to.equal(false);
+    });
+
+    it("Should return true if the service has a registered configuration", () => {
+        expect(serviceCollection.hasConfiguration(Test)).to.equal(true);
+    });
+});
+
+describe("ServiceCollection.getConfiguration", () => {
+    let serviceCollection = Injector.serviceCollection;
+
+    it("Should throw an exception if the service is invalid or not registered", () => {
+        expect(() => serviceCollection.getConfiguration(null)).to.throw("Service must be a valid constructor and be registered as a service.");
+        expect(() => serviceCollection.getConfiguration(undefined)).to.throw("Service must be a valid constructor and be registered as a service.");
+        expect(() => serviceCollection.getConfiguration(Boolean)).to.throw("Service must be a valid constructor and be registered as a service.");
+    });
+
+    it("Should throw an exception if the service is registered but does not have a configuration", () => {
+        expect(() => serviceCollection.getConfiguration(Test2)).to.throw("Service does not have a registered configuration.");
+    });
+
+    it("Should return a function that", () => {
+        expect(serviceCollection.getConfiguration(Test)).to.be.a("function");
     });
 });
