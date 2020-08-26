@@ -1,3 +1,4 @@
+import "./ReflectMetadata.js";
 import { IServiceCollection } from "./interfaces/IServiceCollection.js";
 import { ServiceCollection } from "./ServiceCollection.js";
 

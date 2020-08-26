@@ -1,7 +1,9 @@
 import "./ReflectMetadata.js";
+
 import { IConfiguration } from "./interfaces/IConfiguration.js";
 import { IStartup } from "./interfaces/IStartup.js";
 import { ProtoCommand } from "./ProtoCommand.js";
+import { Injector } from "./Injector.js";
 
 
 export class ProtoCommandBuilder<T> {
@@ -36,12 +38,14 @@ export class ProtoCommandBuilder<T> {
 
     public run(): void {
 
-        let protoCommand = new ProtoCommand();
+        let protoCommand = new ProtoCommand(this._configuration);
         let startup = new this._startup(this._configuration);
 
-        startup.configureServices(protoCommand.serviceCollection);
+        startup.configureServices(Injector.serviceCollection);
 
         startup.configureApp(protoCommand);
+
+        protoCommand.init();
 
         return;
     }

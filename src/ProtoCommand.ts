@@ -1,26 +1,81 @@
 import { IProtoCommand } from "./interfaces/IProtoCommand.js";
-import { IServiceCollection } from "./interfaces/IServiceCollection.js";
 import { IActionExtension } from "./interfaces/IActionExtension.js";
-import { ServiceCollection } from "./ServiceCollection.js";
+import { IConfiguration } from "./interfaces/IConfiguration.js";
+import { Injector } from "./Injector.js";
+
 
 export class ProtoCommand implements IProtoCommand {
-    public readonly serviceCollection: IServiceCollection;
 
-    constructor() {
-        this.serviceCollection = new ServiceCollection();
+    public static title: string;
+    public static description: string;
+
+    private readonly _extensions: Map<new (...args: any[]) => IActionExtension, IActionExtension>;
+
+    constructor(configuration: IConfiguration) {
+
+        if (typeof configuration !== "object" || typeof configuration?.title !== "string" || configuration.title.length === 0)
+            throw new TypeError("Constructor must be supplied with a valid configuration.");
+
+        ProtoCommand.title = configuration.title;
+        ProtoCommand.description = configuration.description ?? "No description.";
+
+        this._extensions = new Map();
     }
 
-    registerExtension<T extends IActionExtension>(extension: IActionExtension): void {
+    public static getConfig<T>(configOption: string): T {
         throw new Error("Method not implemented.");
     }
-    configureExtension<T extends IActionExtension>(extension: IActionExtension, configureCallback: (extension: T) => void): void {
-        throw new Error("Method not implemented.");
+
+    public registerExtension<T extends IActionExtension>(extension: new (...args: any[]) => T): void {
+
+        if (typeof extension !== "function")
+            throw new TypeError("The extension provided is not valid.");
+
+        if (this._extensions.has(extension))
+            throw new Error("Extension has already been registered.");
+
+        this._extensions.set(extension, Injector.resolve(extension));
     }
-    activateExtensionHook(hookCallback: (extension: import("./interfaces/IActionExtension.js").IActionExtension) => void): void {
-        throw new Error("Method not implemented.");
+
+    public configureExtension<T extends IActionExtension>(extension: new (...args: any[]) => T, configureCallback: (extension: T) => void): void {
+
+        if (!this._extensions.has(extension))
+            throw new Error("Cannot configure extension that is not registered.");
+
+        if (typeof configureCallback !== "function")
+            throw new TypeError("The configuration callback must be a function.");
+
+        configureCallback(this._extensions.get(extension) as T);
     }
-    init(): void {
-        throw new Error("Method not implemented.");
+
+    public hasExtension<T extends IActionExtension>(extension: new (...args: any[]) => T): boolean {
+        return this._extensions.has(extension);
+    }
+
+    public getExtension<T extends IActionExtension>(extension: new (...args: any[]) => T): T {
+        if (!this._extensions.has(extension))
+            throw new Error("Extension does not exist.");
+
+        return this._extensions.get(extension) as T;
+    }
+
+    public activateExtensionHook(hookCallback: (extension: IActionExtension) => void): void {
+
+        if (typeof hookCallback !== "function")
+            throw new Error("Extension hook activator is invalid.");
+
+        this._extensions.forEach((ext) => {
+            hookCallback(ext);
+        });
+
+    }
+
+    public init(): void {
+        this.activateExtensionHook((ext) => ext.onInit?.());
+
+        //TODO do something here i forgot??
+
+        this.activateExtensionHook((ext) => ext.onReady?.());
     }
 
 }

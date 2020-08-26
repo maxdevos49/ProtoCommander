@@ -1,7 +1,6 @@
-import { IServiceConfiguration } from "./IServiceConfiguration.js";
 
 export interface IConfiguration {
     title: string;
-    services?: IServiceConfiguration<any>;
+    description?: string;
     custom?: any;
 }
