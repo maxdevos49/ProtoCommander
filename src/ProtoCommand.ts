@@ -9,6 +9,8 @@ export class ProtoCommand implements IProtoCommand {
     public static title: string;
     public static description: string;
 
+    private static configuration: IConfiguration;
+
     private readonly _extensions: Map<new (...args: any[]) => IActionExtension, IActionExtension>;
 
     constructor(configuration: IConfiguration) {
@@ -18,12 +20,20 @@ export class ProtoCommand implements IProtoCommand {
 
         ProtoCommand.title = configuration.title;
         ProtoCommand.description = configuration.description ?? "No description.";
+        ProtoCommand.configuration = configuration;
 
         this._extensions = new Map();
     }
 
-    public static getConfig<T>(configOption: string): T {
-        throw new Error("Method not implemented.");
+    public static getConfig<T>(configKey: string): T {
+
+        if (ProtoCommand.configuration)
+            throw new Error("Configuration has not been initialized.");
+
+        if (typeof configKey !== "string" || configKey.length === 0)
+            throw new TypeError("The config key was not a valid string");
+
+        return (ProtoCommand.configuration as any)[configKey];
     }
 
     public registerExtension<T extends IActionExtension>(extension: new (...args: any[]) => T): void {
